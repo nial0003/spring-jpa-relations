@@ -1,4 +1,7 @@
 package ek.osnb.jpa.orders.repository;
 
-public interface OrderLineRepository {
+import ek.osnb.jpa.orders.model.OrderLine;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface OrderLineRepository extends JpaRepository<OrderLine, Long> {
 }
