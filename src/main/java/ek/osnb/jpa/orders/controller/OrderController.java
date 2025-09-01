@@ -1,5 +1,6 @@
 package ek.osnb.jpa.orders.controller;
 
+import ek.osnb.jpa.orders.dto.OrderDTO;
 import ek.osnb.jpa.orders.model.Order;
 import ek.osnb.jpa.orders.model.OrderStatus;
 import ek.osnb.jpa.orders.service.OrderService;
@@ -20,12 +21,12 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders(@RequestParam(required = false)OrderStatus status){
+    public ResponseEntity<List<OrderDTO>> getAllOrders(@RequestParam(required = false)OrderStatus status){
         return ResponseEntity.ok(orderService.getAllOrders(status));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id){
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id){
         try {
             return ResponseEntity.ok(orderService.getOrderById(id));
         } catch (RuntimeException e){
@@ -34,14 +35,14 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order){
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(order));
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDto){
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(orderDto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order order){
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderDTO orderDto){
         try {
-            return ResponseEntity.ok(orderService.updateOrder(id, order));
+            return ResponseEntity.ok(orderService.updateOrder(id, orderDto));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }

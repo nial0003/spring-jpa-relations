@@ -1,11 +1,14 @@
 package ek.osnb.jpa.orders.service;
 
+import ek.osnb.jpa.orders.dto.OrderDTO;
+import ek.osnb.jpa.orders.dto.OrderMapper;
 import ek.osnb.jpa.orders.model.Order;
 import ek.osnb.jpa.orders.model.OrderStatus;
 import ek.osnb.jpa.orders.repository.OrderLineRepository;
 import ek.osnb.jpa.orders.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,29 +24,36 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getAllOrders(OrderStatus status) {
-        return orderRepository.findAll();
+    public List<OrderDTO> getAllOrders(OrderStatus status) {
+        List<Order> orders = orderRepository.findAll();
+        List <OrderDTO> orderDTOS = new ArrayList<>();
+        for (Order order : orders){
+            orderDTOS.add(OrderMapper.toDto(order));
+        }
+        return orderDTOS;
     }
 
     @Override
-    public Order getOrderById(Long id) {
+    public OrderDTO getOrderById(Long id) {
         Optional<Order> order = orderRepository.findById(id);
         if (order.isPresent()) {
-            return order.get();
+            return OrderMapper.toDto(order.get());
         }
         throw new RuntimeException("Order not found with id: " + id);
     }
 
     @Override
-    public Order createOrder(Order order) {
+    public OrderDTO createOrder(OrderDTO orderDto) {
+        Order order = OrderMapper.toEntity(orderDto);
         order.setId(null);
-        return orderRepository.save(order);
+        return OrderMapper.toDto(orderRepository.save(order));
     }
 
     @Override
-    public Order updateOrder(Long id, Order order) {
+    public OrderDTO updateOrder(Long id, OrderDTO orderDto) {
         Optional<Order> existingOrder = orderRepository.findById(id);
         if (existingOrder.isPresent()){
+            Order order = OrderMapper.toEntity(orderDto);
             Order updatedOrder = existingOrder.get();
             updatedOrder.setOrderDate(order.getOrderDate());
             updatedOrder.setStatus(order.getStatus());
@@ -53,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
                 updatedOrder.addOrderLine(line);
             }
 
-            return orderRepository.save(updatedOrder);
+            return OrderMapper.toDto(orderRepository.save(order));
         }
         throw new RuntimeException("Order not found with id: " + id);
     }
