@@ -3,6 +3,7 @@ package ek.osnb.jpa.orders.service;
 import ek.osnb.jpa.orders.dto.OrderDTO;
 import ek.osnb.jpa.orders.dto.OrderLineDTO;
 import ek.osnb.jpa.orders.dto.OrderMapper;
+import ek.osnb.jpa.orders.dto.OrderUpdateDTO;
 import ek.osnb.jpa.orders.model.Order;
 import ek.osnb.jpa.orders.model.OrderLine;
 import ek.osnb.jpa.orders.model.OrderStatus;
@@ -110,5 +111,17 @@ public class OrderServiceImpl implements OrderService {
         }
         existingOrder.removeOrderLine(lineToRemove);
         return OrderMapper.toDto(orderRepository.save(existingOrder));
+    }
+
+    @Override
+    public OrderDTO updateOrderStatus(Long id, OrderUpdateDTO orderUpdateDTO){
+        Optional<Order> existingOrder = orderRepository.findById(id);
+        if (existingOrder.isEmpty()){
+            throw new RuntimeException("Order not found with id: " + id);
+        }
+        Order order =existingOrder.get();
+        order.setStatus(OrderStatus.valueOf(orderUpdateDTO.status()));
+        Order updatedORder = orderRepository.save(order);
+        return OrderMapper.toDto(updatedORder);
     }
 }
