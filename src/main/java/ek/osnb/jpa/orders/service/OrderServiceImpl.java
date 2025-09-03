@@ -1,8 +1,10 @@
 package ek.osnb.jpa.orders.service;
 
 import ek.osnb.jpa.orders.dto.OrderDTO;
+import ek.osnb.jpa.orders.dto.OrderLineDTO;
 import ek.osnb.jpa.orders.dto.OrderMapper;
 import ek.osnb.jpa.orders.model.Order;
+import ek.osnb.jpa.orders.model.OrderLine;
 import ek.osnb.jpa.orders.model.OrderStatus;
 import ek.osnb.jpa.orders.repository.OrderLineRepository;
 import ek.osnb.jpa.orders.repository.OrderRepository;
@@ -74,5 +76,39 @@ public class OrderServiceImpl implements OrderService {
             orderRepository.deleteById(id);
         }
         throw new RuntimeException("Order not found with id: " + id);
+    }
+
+    @Override
+    public OrderDTO addOrderLine(Long orderId, OrderLineDTO orderLineDTO) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isEmpty()){
+            throw new RuntimeException("Order not found with id: " + orderId);
+        }
+        Order existingOrder = order.get();
+        var line = OrderMapper.toEntity(orderLineDTO);
+        existingOrder.addOrderLine(line);
+        return OrderMapper.toDto(orderRepository.save(existingOrder));
+    }
+
+    @Override
+    public OrderDTO removeOrderLine(Long orderId, Long orderLineId) {
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isEmpty()){
+            throw new RuntimeException("Order not found with id: " + orderId);
+        }
+        Order existingOrder = order.get();
+        OrderLine lineToRemove = null;
+
+        for (var line : existingOrder.getOrderLines()){
+            if (line.getId().equals(orderLineId)){
+                lineToRemove = line;
+                break;
+            }
+        }
+        if (lineToRemove == null){
+            throw new RuntimeException("OrderLine not found with id: " + orderLineId + " in order " + orderId);
+        }
+        existingOrder.removeOrderLine(lineToRemove);
+        return OrderMapper.toDto(orderRepository.save(existingOrder));
     }
 }
