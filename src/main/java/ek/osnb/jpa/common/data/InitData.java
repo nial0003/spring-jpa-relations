@@ -1,8 +1,7 @@
 package ek.osnb.jpa.common.data;
 
-import ek.osnb.jpa.orders.model.Order;
-import ek.osnb.jpa.orders.model.OrderLine;
-import ek.osnb.jpa.orders.model.OrderStatus;
+import ek.osnb.jpa.orders.model.*;
+import ek.osnb.jpa.orders.repository.CategoryRepository;
 import ek.osnb.jpa.orders.repository.OrderLineRepository;
 import ek.osnb.jpa.orders.repository.OrderRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -17,14 +16,35 @@ public class InitData implements CommandLineRunner {
 
     private OrderLineRepository orderLineRepository;
     private OrderRepository orderRepository;
+    private CategoryRepository categoryRepository;
 
-    public InitData(OrderLineRepository orderLineRepository, OrderRepository orderRepository) {
+    public InitData(OrderLineRepository orderLineRepository, OrderRepository orderRepository, CategoryRepository categoryRepository) {
         this.orderLineRepository = orderLineRepository;
         this.orderRepository = orderRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
     public void run(String... args) {
+        Category electronics = new Category();
+        electronics.setName("Electronics");
+
+        Category books = new Category();
+        books.setName("Books");
+
+        categoryRepository.saveAll(List.of(electronics, books));
+
+        Product novel = new Product();
+        novel.setName("novel");
+        novel.setPrice(120);
+
+        Product phone = new Product();
+        phone.setName("Smartphone");
+        phone.setPrice(1400);
+
+        novel.getCategories().add(books);
+        phone.getCategories().add(electronics);
+
         Order order1 = new Order(LocalDate.now(), OrderStatus.PAID);
         Order order2 = new Order(LocalDate.now(), OrderStatus.PAID);
         orderRepository.save(order1);
