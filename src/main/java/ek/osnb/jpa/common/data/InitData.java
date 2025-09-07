@@ -4,6 +4,7 @@ import ek.osnb.jpa.orders.model.*;
 import ek.osnb.jpa.orders.repository.CategoryRepository;
 import ek.osnb.jpa.orders.repository.OrderLineRepository;
 import ek.osnb.jpa.orders.repository.OrderRepository;
+import ek.osnb.jpa.orders.repository.ProductRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +18,13 @@ public class InitData implements CommandLineRunner {
     private OrderLineRepository orderLineRepository;
     private OrderRepository orderRepository;
     private CategoryRepository categoryRepository;
+    private ProductRepository productRepository;
 
-    public InitData(OrderLineRepository orderLineRepository, OrderRepository orderRepository, CategoryRepository categoryRepository) {
+    public InitData(OrderLineRepository orderLineRepository, OrderRepository orderRepository, CategoryRepository categoryRepository, ProductRepository productRepository) {
         this.orderLineRepository = orderLineRepository;
         this.orderRepository = orderRepository;
         this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -44,6 +47,8 @@ public class InitData implements CommandLineRunner {
 
         novel.getCategories().add(books);
         phone.getCategories().add(electronics);
+
+        productRepository.saveAll(List.of(novel,phone));
 
         Order order1 = new Order(LocalDate.now(), OrderStatus.PAID);
         Order order2 = new Order(LocalDate.now(), OrderStatus.PAID);
